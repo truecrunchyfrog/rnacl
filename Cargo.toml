@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "crates/rnacl-core",
+    "crates/rnacl-cli",
+]
+resolver = "2"
