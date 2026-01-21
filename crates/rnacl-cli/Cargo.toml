@@ -1,0 +1,10 @@
+[package]
+name = "rnacl-cli"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+rnacl-core = { path = "../rnacl-core" }
+clap = { version = "4", features = ["derive"] }
+anyhow = "1"
+env_logger = "0.11.8"
