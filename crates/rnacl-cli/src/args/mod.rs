@@ -1,12 +1,53 @@
+pub(crate) mod audit;
+pub(crate) mod dependency;
+pub(crate) mod ledger;
+pub(crate) mod node;
+pub(crate) mod operation;
+pub(crate) mod pipeline;
+
+use clap::{Args, Parser, Subcommand};
+
+use crate::args::{
+    audit::AuditArgs, dependency::DependencyCommand, ledger::LedgerCommand, node::NodeCommand,
+    operation::OperationCommand, pipeline::PipelineCommand,
+};
+
 #[derive(Parser)]
-pub struct Args {
+pub(crate) struct Cli {
+    #[command(flatten)]
+    pub(crate) global: GlobalArgs,
+
     #[command(subcommand)]
-    pub command: Command,
+    pub(crate) command: Command,
+}
+
+#[derive(Args)]
+pub(crate) struct GlobalArgs {
+    #[arg(short, long, action = clap::ArgAction::Count)]
+    pub(crate) verbose: u8,
 }
 
 #[derive(Subcommand)]
-pub enum Command {}
+pub(crate) enum Command {
+    #[command(subcommand, alias = "l")]
+    Ledger(LedgerCommand),
 
-pub fn parse() -> Args {
-    Args::parse()
+    #[command(subcommand, alias = "n")]
+    Node(NodeCommand),
+
+    #[command(subcommand, name = "dep", alias = "d")]
+    Dependency(DependencyCommand),
+
+    #[command(subcommand, alias = "p")]
+    Pipeline(PipelineCommand),
+
+    #[command(subcommand, alias = "o")]
+    Operation(OperationCommand),
+
+    #[command(alias = "a")]
+    Audit(AuditArgs),
+}
+
+pub(crate) fn parse() -> Cli {
+    Cli::parse()
 }

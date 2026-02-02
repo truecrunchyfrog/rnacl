@@ -4,32 +4,53 @@ use log::info;
 
 use crate::ledger::{error::LedgerError, ledger::Ledger};
 
-pub fn init(path: &Path) -> Result<Ledger, LedgerError> {
-    let ledger = Ledger {
-        work_dir: path.to_path_buf(),
-    };
+impl Ledger {
+    pub fn create_ledger(working_dir: &Path) -> Result<Ledger, LedgerError> {
+        let ledger = Ledger::new(Ledger::ledger_dir(working_dir));
 
-    if ledger.rnacl_dir().try_exists()? {
-        if ledger.rnacl_dir().is_dir() {
-            return Err(LedgerError::AlreadyExists(ledger.rnacl_dir()));
-        }
+        populate_ledger_dir(&ledger)?;
 
-        return Err(LedgerError::PathNotDirectory(ledger.rnacl_dir()));
+        Ok(ledger)
     }
-
-    init_ledger(&ledger);
-
-    Ok(ledger)
 }
 
-fn init_ledger(ledger: &Ledger) -> Result<(), LedgerError> {
-    let rnacl_dir = ledger.rnacl_dir();
-    info!("creating {:#?}", rnacl_dir);
-    fs::create_dir(rnacl_dir)?;
+fn populate_ledger_dir(ledger: &Ledger) -> Result<(), LedgerError> {
+    if ledger.dir().try_exists()? {
+        if ledger.dir().is_dir() {
+            return Err(LedgerError::PathAlreadyExists(ledger.dir().to_path_buf()));
+        }
 
-    let nodes_dir = ledger.nodes_dir();
-    info!("creating {:#?}", nodes_dir);
-    fs::create_dir(nodes_dir)?;
+        return Err(LedgerError::PathNotDirectory(ledger.dir().to_path_buf()));
+    }
+
+    {
+        info!("creating {:#?}", ledger.dir());
+        fs::create_dir(&ledger.dir())?;
+
+        {
+            let nodes_dir = ledger.nodes_dir();
+            info!("creating {:#?}", nodes_dir);
+            fs::create_dir(nodes_dir)?;
+        }
+
+        {
+            let snapshots_dir = ledger.snapshots_dir();
+            info!("creating {:#?}", snapshots_dir);
+            fs::create_dir(snapshots_dir)?;
+
+            {
+                let snapshot_baseline_path = ledger.snapshot_baseline_path();
+                info!("creating {:#?}", snapshot_baseline_path);
+                fs::write(snapshot_baseline_path, "{}")?; // TODO
+            }
+
+            {
+                let snapshot_pending_path = ledger.snapshot_pending_path();
+                info!("creating {:#?}", snapshot_pending_path);
+                fs::write(snapshot_pending_path, "{}")?; // TODO
+            }
+        }
+    }
 
     Ok(())
 }

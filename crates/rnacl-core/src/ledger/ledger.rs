@@ -1,16 +1,15 @@
 use std::path::{Path, PathBuf};
 
-use crate::ledger::{
-    error::LedgerError,
-    init::{self},
-};
-
 pub struct Ledger {
-    pub work_dir: PathBuf,
+    dir: PathBuf,
 }
 
 impl Ledger {
-    pub fn init(path: &Path) -> Result<Self, LedgerError> {
-        init::init(path)
+    pub fn new(dir: PathBuf) -> Self {
+        Self { dir }
+    }
+
+    pub fn dir(&self) -> &Path {
+        &self.dir
     }
 }

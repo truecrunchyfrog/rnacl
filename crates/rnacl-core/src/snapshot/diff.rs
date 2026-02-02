@@ -1,0 +1,111 @@
+use std::collections::{HashMap, HashSet};
+
+use crate::{
+    node::id::NodeId,
+    sample::{Sample, batch::Batch},
+    snapshot::Snapshot,
+};
+
+#[derive(Debug)]
+pub struct BatchDiff {
+    before: Option<Batch>,
+    after: Option<Batch>,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum SamplePresence {
+    OnlyBefore,
+    OnlyAfter,
+    Both,
+}
+
+impl BatchDiff {
+    pub fn before(&self) -> &Option<Batch> {
+        &self.before
+    }
+
+    pub fn after(&self) -> &Option<Batch> {
+        &self.after
+    }
+
+    pub fn sample_diff(self) -> Vec<(Sample, SamplePresence)> {
+        let samples_before = self.before.map_or(Vec::new(), |b| b.samples());
+        let samples_after = self.after.map_or(Vec::new(), |b| b.samples());
+
+        let mut result = Vec::new();
+
+        for sample in samples_before {
+            let presence = if samples_after.contains(&sample) {
+                SamplePresence::Both
+            } else {
+                SamplePresence::OnlyBefore
+            };
+
+            result.push((sample, presence));
+        }
+
+        for sample in samples_after {
+            if !result.iter().any(|(s, _)| s == &sample) {
+                result.push((sample, SamplePresence::OnlyAfter));
+            }
+        }
+
+        result
+    }
+}
+
+impl Snapshot {
+    pub fn diff(&self, before: Self) -> HashMap<NodeId, (BatchDiff, Vec<(NodeId, BatchDiff)>)> {
+        let before = before.entries();
+        let after = self.entries();
+
+        let node_ids = HashSet::<NodeId>::from_iter(
+            before
+                .keys()
+                .into_iter()
+                .chain(after.keys().into_iter())
+                .map(|key| key.clone()),
+        );
+
+        HashMap::from_iter(node_ids.into_iter().map(|node_id| {
+            let before = before.get(&node_id);
+            let after = after.get(&node_id);
+
+            let dep_node_ids = HashSet::<NodeId>::from_iter(
+                before
+                    .iter()
+                    .chain(after.iter())
+                    .flat_map(|e| e.dependencies().keys())
+                    .map(|key| key.clone()),
+            );
+
+            (
+                node_id,
+                (
+                    BatchDiff {
+                        before: before.map(|e| e.batch().clone()),
+                        after: after.map(|e| e.batch().clone()),
+                    },
+                    dep_node_ids
+                        .into_iter()
+                        .map(|dep_node_id| {
+                            (
+                                dep_node_id.clone(),
+                                BatchDiff {
+                                    before: before
+                                        .map(|e| e.dependencies().get(&dep_node_id))
+                                        .flatten()
+                                        .cloned(),
+                                    after: after
+                                        .map(|e| e.dependencies().get(&dep_node_id))
+                                        .flatten()
+                                        .cloned(),
+                                },
+                            )
+                        })
+                        .collect::<Vec<_>>(),
+                ),
+            )
+        }))
+    }
+}

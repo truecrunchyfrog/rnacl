@@ -1,10 +1,18 @@
+use std::path::PathBuf;
+
 #[derive(thiserror::Error, Debug)]
 pub enum NodeError {
-    #[error("node {0} already exists")]
-    AlreadyExists(String),
+    #[error("node already exists at {0}")]
+    PathAlreadyExists(PathBuf),
 
-    #[error("node {0} not found")]
-    NotFound(String),
+    #[error("node not found at {0}")]
+    PathNotFound(PathBuf),
+
+    #[error("node not found: {0}")]
+    NoSuchNodeId(String),
+
+    #[error("ambiguous node ID: {0}")]
+    AmbiguousNodeId(String),
 
     #[error(transparent)]
     Json(#[from] serde_json::Error),
