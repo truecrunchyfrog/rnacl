@@ -1,0 +1,62 @@
+{
+  "449006dc": {
+    "batch": [],
+    "dependencies": {}
+  },
+  "a1041773": {
+    "batch": [
+      {
+        "traces": [
+          {
+            "_op": "heads.nums",
+            "src": "a"
+          },
+          {
+            "_op": "increment"
+          }
+        ],
+        "content": "2"
+      },
+      {
+        "traces": [
+          {
+            "src": "b",
+            "_op": "heads.nums"
+          },
+          {
+            "_op": "increment"
+          }
+        ],
+        "content": "3"
+      }
+    ],
+    "dependencies": {
+      "a1041773": [
+        {
+          "traces": [
+            {
+              "_op": "heads.nums",
+              "src": "a"
+            },
+            {
+              "_op": "increment"
+            }
+          ],
+          "content": "2"
+        },
+        {
+          "traces": [
+            {
+              "src": "b",
+              "_op": "heads.nums"
+            },
+            {
+              "_op": "increment"
+            }
+          ],
+          "content": "3"
+        }
+      ]
+    }
+  }
+}

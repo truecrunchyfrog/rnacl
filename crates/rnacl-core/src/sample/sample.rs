@@ -26,4 +26,8 @@ impl Sample {
 
         self
     }
+
+    pub fn content(&self) -> &String {
+        &self.content
+    }
 }

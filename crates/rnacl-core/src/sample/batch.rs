@@ -17,8 +17,16 @@ impl Batch {
         Self(self.0.into_iter().filter_map(f).collect::<Vec<_>>())
     }
 
-    pub fn samples(self) -> Vec<Sample> {
+    pub fn into_samples(self) -> Vec<Sample> {
         self.0
+    }
+
+    pub fn samples(&self) -> &[Sample] {
+        &self.0
+    }
+
+    pub fn samples_mut(&mut self) -> &mut Vec<Sample> {
+        &mut self.0
     }
 }
 

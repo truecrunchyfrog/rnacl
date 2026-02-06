@@ -1,0 +1,19 @@
+{
+  "description": null,
+  "dependencies": ["a1041773"],
+  "pipeline": [
+    {
+      "operation_id": "heads.nums",
+      "options": {
+        "a": 1,
+        "b": 2
+      }
+    },
+    {
+      "operation_id": "increment",
+      "options": {
+        "amount": 1
+      }
+    }
+  ]
+}

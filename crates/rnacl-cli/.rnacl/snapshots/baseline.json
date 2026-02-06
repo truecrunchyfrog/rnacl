@@ -1,0 +1,35 @@
+{
+  "449006dc": {
+    "batch": [],
+    "dependencies": {}
+  },
+  "a1041773": {
+    "batch": [
+      {
+        "traces": [
+          {
+            "src": "a",
+            "_op": "heads.nums"
+          },
+          {
+            "_op": "increment"
+          }
+        ],
+        "content": "2"
+      },
+      {
+        "traces": [
+          {
+            "src": "b",
+            "_op": "heads.nums"
+          },
+          {
+            "_op": "increment"
+          }
+        ],
+        "content": "3"
+      }
+    ],
+    "dependencies": {}
+  }
+}

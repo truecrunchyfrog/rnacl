@@ -1,3 +1,11 @@
+mod args;
+mod commands;
+pub(crate) mod helper;
+mod logging;
+pub(crate) mod output;
+pub(crate) mod reuse_node;
+pub(crate) mod ui;
+
 use std::{collections::HashMap, process::ExitCode};
 
 use rnacl_core::{
@@ -6,13 +14,6 @@ use rnacl_core::{
     sample::{Sample, Trace, batch::Batch},
 };
 use serde_json::json;
-
-mod args;
-mod commands;
-pub(crate) mod helper;
-mod logging;
-pub(crate) mod reuse_node;
-pub(crate) mod ui;
 
 fn main() -> ExitCode {
     let cli = args::parse();

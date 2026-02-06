@@ -1,0 +1,3 @@
+- ttl/cache
+- användarinställningar; tvinga verifiering för nya opålitliga ops, antingen manuellt eller genom signering.
+- ircl
